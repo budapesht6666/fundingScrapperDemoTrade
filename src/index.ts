@@ -76,17 +76,18 @@ async function main() {
 
             // Уведомление
             await sendTelegramNotification({
-              takeProfitUSDT,
-              qty,
-              stopLoss: stopLoss.toString(),
-              takeProfit: takeProfit.toString(),
-              ticker,
+              message: `📈 <b>${ticker.symbol}</b> ⭐ <b>${(ticker.fundingRate * 100).toFixed(
+                4,
+              )}%</b> ⭐\n💲<b>currentPrice=${
+                ticker.lastPrice
+              }</b>💲\n💲<b>${takeProfitUSDT}$</b>💲\n💲<b>qty=${qty}$</b>💲\n💲<b>takePrice=${takeProfit}</b>💲\n💲<b>stopPrice=${stopLoss}</b>💲`,
             });
           }
         }
       }
     } catch (e) {
       console.error('Ошибка в основном цикле:', e);
+      await sendTelegramNotification({ message: `'Ошибка в основном цикле:', ${e}` });
     }
 
     // Ждём до следующего часа
@@ -95,6 +96,7 @@ async function main() {
   }
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error('Ошибка в работе бота:', err);
+  await sendTelegramNotification({ message: `'Ошибка в работе бота:', ${err}` });
 });
