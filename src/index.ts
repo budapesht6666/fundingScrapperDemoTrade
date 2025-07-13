@@ -5,6 +5,7 @@ import { closeLong } from './helpers/orders/closeLong.js';
 import { openLong } from './helpers/orders/openLong.js';
 import { sendTelegramNotification } from './helpers/sendTelegramNotification.js';
 import { getParams } from './helpers/getParams.js';
+import { getParamsAndOpenLong } from './examples/getParamsAndOpenLong.js';
 
 // Загрузка переменных окружения
 const {
@@ -31,6 +32,9 @@ if (
 
 async function main() {
   console.log('fundingScrapperDemoTrade запущен');
+
+  // getParamsAndOpenLong();
+  // return;
 
   while (true) {
     try {

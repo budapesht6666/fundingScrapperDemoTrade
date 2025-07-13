@@ -19,6 +19,7 @@ export async function openLong({
     reduceOnly: false,
   });
   console.log('🚀 ~ order:', order);
+  console.log('client timestamp:', Date.now() - order.time);
 
   return order;
 }
