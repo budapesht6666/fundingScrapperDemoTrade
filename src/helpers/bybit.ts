@@ -11,6 +11,8 @@ if (!BYBIT_API_KEY || !BYBIT_API_SECRET) {
 export const bybit = new RestClientV5({
   key: BYBIT_API_KEY,
   secret: BYBIT_API_SECRET,
+  demoTrading: true,
+  syncTimeBeforePrivateRequests: true,
 });
 
 export interface FundingTicker {

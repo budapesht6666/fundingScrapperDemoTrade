@@ -14,16 +14,14 @@ export async function getParamsAndOpenLong() {
     const { qty, stopLoss, takeProfit } = params;
     console.log(`2. params:`, params);
 
-    setTimeout(async () => {
-      const order = await openLong({
-        symbol: ticker.symbol,
-        qty,
-        stopLoss: stopLoss.toFixed(4),
-        takeProfit: takeProfit.toFixed(4),
-      });
+    const order = await openLong({
+      symbol: ticker.symbol,
+      qty,
+      stopLoss,
+      takeProfit,
+    });
 
-      console.log('3. order:', order);
-    }, 10);
+    console.log('3. order:', order.result.orderId || order.retMsg);
   } catch (error) {
     console.error('Ошибка в getParamsAndOpenLong:', error);
   }
