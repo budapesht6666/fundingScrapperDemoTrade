@@ -47,19 +47,22 @@ async function main() {
           // Считаем задержку до funding
           const now = Date.now();
           const delay = ticker.nextFundingTime - now;
+          const dt = 2 * 1000;
 
           if (delay < 3600 * 1000) {
             console.log(`2. ${ticker.symbol} - delay in minutes:`, delay / 1000 / 60);
 
             await setLeverage(ticker);
-            const params = await getParams(ticker);
-
-            if (!params) return;
-
-            const { qty, stopLoss, takeProfit, takeProfitUSDT } = params;
-            console.log(`3. { qty, stopLoss, takeProfit, takeProfitUSDT }:`, params);
 
             setTimeout(async () => {
+              const params = await getParams(ticker);
+
+              if (!params) return;
+
+              const { qty, stopLoss, takeProfit, findingProfitUSDT, targetProfitUsdt, lossUSDT } =
+                params;
+              console.log(`3. { qty, stopLoss, takeProfit, findingProfitUSDT }:`, params);
+
               const order = await openLong({
                 symbol: ticker.symbol,
                 qty,
@@ -67,21 +70,21 @@ async function main() {
                 takeProfit,
               });
               console.log('4. order:', order.result.orderId || order.retMsg);
-            }, delay - 2 * 1000);
 
-            setTimeout(async () => {
-              const sellOrder = await closeLong({ symbol: ticker.symbol, qty });
-              console.log('5. sellOrder:', sellOrder.result.orderId || sellOrder.retMsg);
-            }, delay + 100);
+              setTimeout(async () => {
+                const sellOrder = await closeLong({ symbol: ticker.symbol, qty });
+                console.log('5. sellOrder:', sellOrder.result.orderId || sellOrder.retMsg);
+              }, dt + 250);
 
-            // Уведомление
-            await sendTelegramNotification({
-              message: `📈 <b>${ticker.symbol}</b> ⭐ <b>${(ticker.fundingRate * 100).toFixed(
-                4,
-              )}%</b> ⭐\n💲<b>currentPrice=${
-                ticker.lastPrice
-              }</b>💲\n💲<b>${takeProfitUSDT}$</b>💲\n💲<b>qty=${qty}$</b>💲\n💲<b>takePrice=${takeProfit}</b>💲\n💲<b>stopPrice=${stopLoss}</b>💲`,
-            });
+              // Уведомление
+              await sendTelegramNotification({
+                message: `📈 <b>${ticker.symbol}</b> ⭐ <b>${(ticker.fundingRate * 100).toFixed(
+                  4,
+                )}%</b> ⭐\n💲<b>currentPrice=${
+                  ticker.lastPrice
+                }</b>💲\n💲<b>findingProfit=${findingProfitUSDT}$</b>💲\n💲<b>profitUsdt=${targetProfitUsdt}$</b>💲\n💲<b>lossUSDT=${lossUSDT}$</b>💲\n💲<b>qty=${qty}$</b>💲\n💲<b>takePrice=${takeProfit}</b>💲\n💲<b>stopPrice=${stopLoss}</b>💲`,
+              });
+            }, delay - dt);
           }
         }
       }

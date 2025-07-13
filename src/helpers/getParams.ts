@@ -12,10 +12,10 @@ function calcTakeProfitFromFundingRate({
   positionValue: number; // например: 100 * 10 = 1000 USDT
   entryPrice: number; // например: 30000 USDT
   positionSize: number; // например: 0.033 BTC
-}): number {
-  const targetProfit = 0.9 * Math.abs(fundingRate) * positionValue; // в USDT
-  const tpPrice = entryPrice + targetProfit / positionSize; // в цене актива
-  return tpPrice;
+}) {
+  const targetProfitUsdt = 0.9 * Math.abs(fundingRate) * positionValue; // в USDT
+  const takeProfit = entryPrice + targetProfitUsdt / positionSize; // в цене актива
+  return { takeProfit, targetProfitUsdt };
 }
 
 function calcStopLossFromTakeProfit({
@@ -26,11 +26,11 @@ function calcStopLossFromTakeProfit({
   tpPrice: number; // в цене актива
   entryPrice: number; // цена входа
   positionSize: number; // qty, например BTC
-}): number {
+}) {
   const profitUSDT = (tpPrice - entryPrice) * positionSize;
   const lossUSDT = 0.5 * profitUSDT;
-  const slPrice = entryPrice - lossUSDT / positionSize;
-  return slPrice;
+  const stopLoss = entryPrice - lossUSDT / positionSize;
+  return { stopLoss, lossUSDT };
 }
 
 async function getQuantity({ symbol, price }: { symbol: string; price: number }) {
@@ -65,14 +65,14 @@ export async function getParams(ticker: FundingTicker) {
     const positionValue = Number(ORDER_USDT) * Number(LEVERAGE);
     const positionSize = positionValue / ticker.lastPrice;
 
-    const takeProfit = calcTakeProfitFromFundingRate({
+    const { takeProfit, targetProfitUsdt } = calcTakeProfitFromFundingRate({
       fundingRate: ticker.fundingRate,
       positionValue,
       positionSize,
       entryPrice: ticker.lastPrice,
     });
 
-    const stopLoss = calcStopLossFromTakeProfit({
+    const { stopLoss, lossUSDT } = calcStopLossFromTakeProfit({
       entryPrice: ticker.lastPrice,
       positionSize,
       tpPrice: takeProfit,
@@ -85,7 +85,9 @@ export async function getParams(ticker: FundingTicker) {
       qty,
       stopLoss: stopLoss.toFixed(lastPriceDecimals),
       takeProfit: takeProfit.toFixed(lastPriceDecimals),
-      takeProfitUSDT: takeProfitUSDT.toFixed(2),
+      findingProfitUSDT: takeProfitUSDT.toFixed(2),
+      targetProfitUsdt,
+      lossUSDT,
     };
   } catch (error) {
     console.error('❌ Ошибка в getParams:', error);
