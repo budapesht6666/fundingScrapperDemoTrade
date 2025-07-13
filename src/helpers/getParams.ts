@@ -28,12 +28,12 @@ function calcStopLossFromTakeProfit({
   positionSize: number; // qty, например BTC
 }): number {
   const profitUSDT = (tpPrice - entryPrice) * positionSize;
-  const lossUSDT = 0.3 * profitUSDT;
+  const lossUSDT = 0.5 * profitUSDT;
   const slPrice = entryPrice - lossUSDT / positionSize;
   return slPrice;
 }
 
-async function getQuantity({ symbol, price }: { symbol: string; price: number }): Promise<string> {
+async function getQuantity({ symbol, price }: { symbol: string; price: number }) {
   // 1. Запрос параметров инструмента
   const instr = await bybit.getInstrumentsInfo({ category: 'linear', symbol });
   const info = instr.result.list.find((i) => i.symbol === symbol);
@@ -79,8 +79,14 @@ export async function getParams(ticker: FundingTicker) {
     });
 
     const takeProfitUSDT = (takeProfit - ticker.lastPrice) * positionSize;
+    const lastPriceDecimals = (ticker.lastPrice.toString().split('.')[1] || '').length;
 
-    return { qty, stopLoss, takeProfit, takeProfitUSDT };
+    return {
+      qty,
+      stopLoss: stopLoss.toFixed(lastPriceDecimals),
+      takeProfit: takeProfit.toFixed(lastPriceDecimals),
+      takeProfitUSDT: takeProfitUSDT.toFixed(2),
+    };
   } catch (error) {
     console.error('❌ Ошибка в getParams:', error);
   }

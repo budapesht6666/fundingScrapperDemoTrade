@@ -7,8 +7,6 @@ export async function getTopNegativeFundingTickers(): Promise<FundingTicker[]> {
     throw new Error('Некорректный ответ getTickers');
   }
 
-  res.result.list[0].lastPrice;
-
   return res.result.list
     .map((t: any) => ({
       // ...t,

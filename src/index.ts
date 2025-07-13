@@ -5,6 +5,7 @@ import { closeLong } from './helpers/orders/closeLong.js';
 import { openLong } from './helpers/orders/openLong.js';
 import { sendTelegramNotification } from './helpers/sendTelegramNotification.js';
 import { getParams } from './helpers/getParams.js';
+import { getParamsAndOpenLong } from './examples/getParamsAndOpenLong.js';
 
 // Загрузка переменных окружения
 const {
@@ -32,10 +33,14 @@ if (
 async function main() {
   console.log('fundingScrapperDemoTrade запущен');
 
+  // test example
+  // getParamsAndOpenLong();
+  // return;
+
   while (true) {
     try {
       const topTickers = await getTopNegativeFundingTickers();
-      console.log('topTickers', topTickers);
+      console.log('1. topTickers', topTickers);
 
       for (const ticker of topTickers) {
         if (ticker.fundingRate <= Number(CONVENIENT_FR) / 100) {
@@ -44,7 +49,7 @@ async function main() {
           const delay = ticker.nextFundingTime - now;
 
           if (delay < 3600 * 1000) {
-            console.log(`${ticker.symbol} - delay in minutes:`, delay / 1000 / 60);
+            console.log(`2. ${ticker.symbol} - delay in minutes:`, delay / 1000 / 60);
 
             await setLeverage(ticker);
             const params = await getParams(ticker);
@@ -52,25 +57,22 @@ async function main() {
             if (!params) return;
 
             const { qty, stopLoss, takeProfit, takeProfitUSDT } = params;
-            console.log(`🚀 ~ main ~ { qty, stopLoss, takeProfit, takeProfitUSDT }:`, {
-              qty,
-              stopLoss,
-              takeProfit,
-              takeProfitUSDT,
-            });
+            console.log(`3. { qty, stopLoss, takeProfit, takeProfitUSDT }:`, params);
 
-            setTimeout(
-              () =>
-                openLong({
-                  symbol: ticker.symbol,
-                  qty,
-                  stopLoss: stopLoss.toFixed(4), // TODO как getQuantity
-                  takeProfit: takeProfit.toFixed(4),
-                }),
-              delay - 2 * 1000,
-            );
+            setTimeout(async () => {
+              const order = await openLong({
+                symbol: ticker.symbol,
+                qty,
+                stopLoss,
+                takeProfit,
+              });
+              console.log('4. order:', order.result.orderId || order.retMsg);
+            }, delay - 2 * 1000);
 
-            setTimeout(() => closeLong({ symbol: ticker.symbol, qty }), delay + 100);
+            setTimeout(async () => {
+              const sellOrder = await closeLong({ symbol: ticker.symbol, qty });
+              console.log('5. sellOrder:', sellOrder.result.orderId || sellOrder.retMsg);
+            }, delay + 100);
 
             // Уведомление
             await sendTelegramNotification({

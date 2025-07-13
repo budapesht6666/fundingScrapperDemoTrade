@@ -4,7 +4,7 @@ const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
 
 type Params = {
   ticker: FundingTicker;
-  takeProfitUSDT: number;
+  takeProfitUSDT: string;
   qty: string;
   stopLoss: string;
   takeProfit: string;
@@ -18,9 +18,9 @@ export async function sendTelegramNotification({
 }: Params) {
   const message = `📈 <b>${ticker.symbol}</b> ⭐ <b>${(ticker.fundingRate * 100).toFixed(
     4,
-  )}%</b> ⭐\n💲<b>currentPrice=${ticker.lastPrice}</b>💲\n💲<b>${takeProfitUSDT.toFixed(
-    2,
-  )}$</b>💲\n💲<b>qty=${qty}$</b>💲\n💲<b>takePrice=${takeProfit}</b>💲\n💲<b>stopPrice=${stopLoss}</b>💲`;
+  )}%</b> ⭐\n💲<b>currentPrice=${
+    ticker.lastPrice
+  }</b>💲\n💲<b>${takeProfitUSDT}$</b>💲\n💲<b>qty=${qty}$</b>💲\n💲<b>takePrice=${takeProfit}</b>💲\n💲<b>stopPrice=${stopLoss}</b>💲`;
 
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   const body = {

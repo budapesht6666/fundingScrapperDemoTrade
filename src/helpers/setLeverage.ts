@@ -11,7 +11,6 @@ export async function setLeverage(ticker: FundingTicker) {
       buyLeverage: String(LEVERAGE),
       sellLeverage: String(LEVERAGE),
     });
-    console.log('setLeverageRes:', setLeverageRes);
 
     return setLeverageRes;
   } catch (error) {
