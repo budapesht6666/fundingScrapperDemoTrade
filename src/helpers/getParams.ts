@@ -86,8 +86,8 @@ export async function getParams(ticker: FundingTicker) {
       stopLoss: stopLoss.toFixed(lastPriceDecimals),
       takeProfit: takeProfit.toFixed(lastPriceDecimals),
       findingProfitUSDT: takeProfitUSDT.toFixed(2),
-      targetProfitUsdt,
-      lossUSDT,
+      targetProfitUsdt: targetProfitUsdt.toFixed(2),
+      lossUSDT: lossUSDT.toFixed(2),
     };
   } catch (error) {
     console.error('❌ Ошибка в getParams:', error);
