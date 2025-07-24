@@ -1,5 +1,6 @@
 import { getTopNegativeFundingTickers } from './api/getFundingTickers.js';
 import { getParams } from './api/getParams.js';
+import { getTickerByName } from './api/getTickerByName.js';
 import { closeLong } from './api/orders/closeLong.js';
 import { openLong } from './api/orders/openLong.js';
 import { sendTelegramNotification } from './api/sendTelegramNotification.js';
@@ -17,20 +18,21 @@ export async function tradingStrategy() {
       const topTickers = await getTopNegativeFundingTickers();
       console.log('1. topTickers', topTickers.map((ticker) => getTickerLogStr(ticker)).join('; '));
 
-      for (const ticker of topTickers) {
-        if (ticker.fundingRate > Number(CONVENIENT_FR) / 100) continue;
+      for (const topTicker of topTickers) {
+        if (topTicker.fundingRate > Number(CONVENIENT_FR) / 100) continue;
 
         // Считаем задержку до funding
-        const delay = ticker.nextFundingTime - Date.now();
+        const delay = topTicker.nextFundingTime - Date.now();
         const dt = 2 * 1000;
 
         if (delay > 3600 * 1000) continue;
 
-        console.log(`2. Будет открыта позиция`, getTickerLogStr(ticker));
+        console.log(`2. Будет открыта позиция`, getTickerLogStr(topTicker));
 
-        await setLeverage(ticker);
+        await setLeverage(topTicker);
 
         setTimeout(async () => {
+          const ticker = await getTickerByName(topTicker.symbol);
           const params = await getParams(ticker);
 
           if (!params) return;
@@ -68,6 +70,6 @@ export async function tradingStrategy() {
 
     // Ждём до следующего часа
     const msToNextHour = 3600 * 1000 - (Date.now() % 3600) * 1000;
-    await new Promise((res) => setTimeout(res, msToNextHour));
+    await new Promise((res) => setTimeout(res, msToNextHour - 5000));
   }
 }

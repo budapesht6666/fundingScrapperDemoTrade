@@ -13,7 +13,7 @@ export async function getTickerByName(
   return ticker.result.list.map((t: any) => ({
     symbol: t.symbol,
     fundingRate: parseFloat(t.fundingRate),
-    nextFundingTime: Number(t.nextFundingTime),
+    nextFundingTime: parseFloat(t.nextFundingTime),
     volume24h: parseFloat(t.volume24h),
     lastPrice: parseFloat(t.lastPrice),
   }))[0];

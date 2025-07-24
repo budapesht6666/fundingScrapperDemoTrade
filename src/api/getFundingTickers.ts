@@ -12,7 +12,7 @@ export async function getTopNegativeFundingTickers(): Promise<FundingTicker[]> {
       // ...t,
       symbol: t.symbol,
       fundingRate: parseFloat(t.fundingRate),
-      nextFundingTime: Number(t.nextFundingTime),
+      nextFundingTime: parseFloat(t.nextFundingTime),
       volume24h: parseFloat(t.volume24h),
       lastPrice: parseFloat(t.lastPrice),
     }))
