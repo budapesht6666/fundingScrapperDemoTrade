@@ -1,6 +1,6 @@
-import { getParams } from '../helpers/getParams.js';
-import { getTickerByName } from '../helpers/getTickerByName.js';
-import { openLong } from '../helpers/orders/openLong.js';
+import { getParams } from '../api/getParams.js';
+import { getTickerByName } from '../api/getTickerByName.js';
+import { openLong } from '../api/orders/openLong.js';
 
 export async function getParamsAndOpenLong() {
   try {
