@@ -1,11 +1,12 @@
 import { getParams } from '../api/getParams.js';
 import { getTickerByName } from '../api/getTickerByName.js';
 import { openLong } from '../api/orders/openLong.js';
+import { getTickerLogStr } from '../helpers/getTickerLogStr.js';
 
 export async function getParamsAndOpenLong() {
   try {
-    const ticker = await getTickerByName('MUSDT');
-    console.log('1. ticker:', ticker);
+    const ticker = await getTickerByName('SDUSDT');
+    console.log('1. ticker:', getTickerLogStr(ticker));
 
     const params = await getParams(ticker);
 
